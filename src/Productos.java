@@ -68,5 +68,26 @@ public class Productos {
         }
 
     }
+    public static double obtenerPrecio(Connection conexion, String nombre){
+        try {
+            String obtenerPrecio = "SELECT Precio FROM Productos WHERE Nombre = ?";
+            PreparedStatement ps = conexion.prepareStatement(obtenerPrecio);
+            ps.setString(1, nombre);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+                return rs.getDouble("Precio");
+            
+            }else{
+                System.out.println("El producto no existe");
+                return -1;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener el precio");
+            e.printStackTrace();
+            return -1;
+        }
+        
+    }
 
 }

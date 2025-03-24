@@ -31,5 +31,55 @@ public class Ventas {
             e.printStackTrace();
         }
     }
+
+    public static void registrarVenta(Connection conexion,String nombre_producto, String talla,int cant,String pago,String nombre_cliente){
+        int clienteID = Clientes.verificarOInsertarCliente(conexion, nombre_cliente);
+
+        int productoID = Productos.verificarProducto(conexion, nombre_producto);
+        if(productoID==-1){
+            System.out.println("El producto no existe");
+            return;
+        }
+        int tallaID = Tallas.verificarTalla(conexion, talla);
+        if(tallaID ==-1){
+            System.out.println("La talla no existe");
+            return;
+        }
+        if(!Inventario.verificarStock(conexion, productoID, tallaID, cant)){
+            System.out.println("No se pueden retirar mas de los que hay en el inventario");
+            return;
+        }
+        double precio = Productos.obtenerPrecio(conexion, nombre_producto);
+        double total = precio * cant;
+
+        int ventaID = insertarVenta(conexion, pago, clienteID,total);
+
+        DetalleVenta.insertarDetalle(conexion, ventaID, productoID, tallaID, cant, precio);
+
+    }
+    public static int insertarVenta(Connection conexion, String metodoPago, int clienteID,double total){
+        try {
+            String insertarVenta = "INSERT INTO Ventas (Cliente_id, Fecha, Total, Metodo_pago) VALUES (?, NOW(), ?, ?)";
+            PreparedStatement ps = conexion.prepareStatement(insertarVenta, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, clienteID);
+            ps.setDouble(2, total);
+            ps.setString(3, metodoPago);
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            int ventaID = -1;
+            if(rs.next()){
+                ventaID = rs.getInt(1);
+            }else{
+                throw new SQLException("Error al obtener el id de la venta");
+            }
+            return ventaID;
+        } catch (SQLException e) {
+            System.out.println("Error al insertar la venta");
+            e.printStackTrace();
+            return -1;
+        }
+        
+    }
      
 }

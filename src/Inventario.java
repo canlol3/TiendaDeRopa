@@ -1,9 +1,6 @@
 import java.sql.*;
-import java.util.Scanner;
 
 public class Inventario {
-   int cantidad;
-
    public static void verInventario(Connection conexion) {
       String query = """
             SELECT p.Nombre,t.Talla,i.Cantidad
@@ -100,11 +97,10 @@ public class Inventario {
       }
       
    }
-   public static void eliminarInventario(Connection conexion,String nombre, String talla,int cant){
+   public static void eliminarInventario(Connection conexion,String nombre, String talla,int cant,boolean admin){
 
       try {
          String obtenerProductoID = "SELECT Producto_id FROM Productos WHERE Nombre = ?";
-          
           PreparedStatement ps = conexion.prepareStatement(obtenerProductoID);
          ps.setString(1, nombre);
          ResultSet rsProducto = ps.executeQuery();
@@ -133,7 +129,9 @@ public class Inventario {
                      psEliminar.setInt(1,productoID);
                      psEliminar.setInt(2, tallaID);
                      psEliminar.executeUpdate();
-                     System.out.println("Producto eliminado del inventario: "+nombre+" Talla: "+talla);
+                     if(admin){
+                        System.out.println("Producto eliminado del inventario: "+nombre+" Talla: "+talla);
+                     }
                   }else{
                      String actualizarInventario= "UPDATE Inventario SET Cantidad = ? WHERE Producto_id = ? AND Talla_id = ?";
                      PreparedStatement psActualizar = conexion.prepareStatement(actualizarInventario);
@@ -141,7 +139,9 @@ public class Inventario {
                      psActualizar.setInt(2, productoID);
                      psActualizar.setInt(3, tallaID);
                      psActualizar.executeUpdate();
-                     System.out.println("Stock actualizado: "+ cantidadNueva+ " unidades para: "+nombre+ " Talla: "+talla);
+                     if(admin){
+                        System.out.println("Stock actualizado: "+ cantidadNueva+ " unidades para: "+nombre+ " Talla: "+talla);
+                     }
                   }
                }else{
                   System.out.println("No se encontro el producto con esa talla");
@@ -155,5 +155,24 @@ public class Inventario {
       } catch (SQLException e) {
          e.printStackTrace();
       }
+   }
+   public static boolean verificarStock(Connection conexion, int productoID, int tallaID,int cant){
+      String verificarStock= "SELECT Cantidad FROM Inventario WHERE Producto_id = ? AND Talla_id = ?";
+      try {
+         PreparedStatement ps = conexion.prepareStatement(verificarStock);
+         ps.setInt(1, productoID);
+         ps.setInt(2,tallaID);
+         ResultSet rs = ps.executeQuery();
+         if(!rs.next() || rs.getInt("Cantidad")<cant){
+            return false;
+         }else{
+            return true;
+         }
+      } catch (SQLException e) {
+         System.out.println("Error al verificar el stock");
+         e.printStackTrace();
+         return false;
+      }
+      
    }
 }
