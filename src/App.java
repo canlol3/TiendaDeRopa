@@ -1,12 +1,17 @@
 import java.sql.Connection;
 
 public class App {
-    public static void main(String[] args) throws Exception {
+    public static Connection asegurarBBDD(){
         Connection conexion = ConnectionBD.conectar();
         if(conexion==null){
             System.out.println("No hay conexión con la base de datos (MAIN)");
-            return;
+            return conexion;
+        }else{
+            return conexion;
         }
+    }
+    public static void main(String[] args) throws Exception {
+        Connection conexion = asegurarBBDD();
         String usuario;
         String contrasena;
         System.out.print("Introduzca el usuario: ");
@@ -14,7 +19,6 @@ public class App {
         System.out.print("Introduzca la contraseña: ");
         contrasena = System.console().readLine();
         boolean login = Usuarios.login(conexion,usuario,contrasena);
-        
         if(login){
             System.out.println("Eres admin");
             gestionEmpleado(conexion);
@@ -53,6 +57,9 @@ public class App {
                     break;
                 case 3:
                     // Ver mis compras
+                    separador();
+                    Ventas.verComprasCliente(conexion, nombre_cliente);
+                    separador();
                     break;
                 case 4:
                     // Salir
@@ -74,7 +81,9 @@ public class App {
                     break;
                 case 2:
                     // Ver ventas
-                    Ventas.verTodas(conexion);
+                    separador();
+                    Ventas.verTodasVentas(conexion);
+                    separador();
                     break;
                 case 3:
                     // Añadir inventario
@@ -122,5 +131,8 @@ public class App {
         }
 
         
+    }
+    public static void separador(){
+        System.out.println("-----------------------------------------------------------------------------------------------------------");
     }
 }

@@ -1,19 +1,24 @@
 import java.sql.*;
 import java.text.SimpleDateFormat;
 public class Ventas {
-    public static void verTodas(Connection conexion){
+    public static void verComprasCliente(Connection conexion,String nombre){
         String query = """
             SELECT v.Venta_id, c.Nombre AS Cliente, v.Fecha, v.Total, v.Metodo_pago
             FROM Ventas v
             LEFT JOIN Clientes c ON v.Cliente_id = c.Cliente_id
+            WHERE c.Nombre = ?
             ORDER BY v.Fecha DESC;
         """;
         try {
-            Statement st = conexion.createStatement();
-            ResultSet rs = st.executeQuery(query);
+            PreparedStatement ps = conexion.prepareStatement(query);
+            ps.setString(1,nombre);
+            ResultSet rs = ps.executeQuery();
+
             SimpleDateFormat fecha_format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            System.out.println("-----------------------------------------------------------------------------------------------------------");
+            boolean hayCompras = false;
+
             while (rs.next()) {
+                hayCompras = true;
                 int idVenta = rs.getInt("Venta_id");
                 String cliente = (rs.getString("Cliente") != null) ? rs.getString("Cliente") : "Desconocido";
                 Timestamp fecha = rs.getTimestamp("Fecha");
@@ -24,10 +29,27 @@ public class Ventas {
                                   idVenta, cliente, fecha_formateada, total, metodoPago);
 
             }
-            System.out.println("-----------------------------------------------------------------------------------------------------------");
+            if(!hayCompras){
+                System.out.println("No se ha registrado ventas como: "+nombre);
+            }
 
         } catch (SQLException e) {
             System.out.println("Error al obtener todas las ventas ");
+            e.printStackTrace();
+        }
+    }
+
+    public static void verTodasVentas(Connection conexion){
+        String clientes = "SELECT DISTINCT Nombre FROM Clientes";
+        try {
+            Statement st = conexion.createStatement();
+            ResultSet rs = st.executeQuery(clientes);
+            while (rs.next()) {
+                String nombre =rs.getString("Nombre");
+                verComprasCliente(conexion, nombre);
+            }
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

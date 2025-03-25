@@ -5,27 +5,20 @@ import java.sql.SQLException;
 
 public class Clientes {
 
-    public static int verificarOInsertarCliente(Connection conexion, String nombre){
-        try {
-            String verificarCliente= "SELECT Cliente_id FROM Clientes WHERE Nombre = ?";
-            PreparedStatement ps = conexion.prepareStatement(verificarCliente);
-            ps.setString(1, nombre);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                return rs.getInt("Cliente_id");
-            }else{
-                System.out.println("Ingrese su teléfono: ");
-                String telefono = System.console().readLine();
-                return insertarCliente(conexion, nombre, telefono);    
-            }
+    public static int verificarOInsertarCliente(Connection conexion, String nombre) {
 
-        } catch (SQLException e) {
-            System.out.println("Error al verificar al cliente");
-            e.printStackTrace();
-            return -1;
+        int id = obtenerClienteID(conexion, nombre);
+        if (id != -1) {
+            return id;
+        } else {
+            System.out.println(" Ingrese su teléfono: ");
+            String telefono = System.console().readLine();
+            return insertarCliente(conexion, nombre, telefono);
         }
+
     }
-    public static int insertarCliente(Connection conexion,String nombre,String telefono){
+
+    public static int insertarCliente(Connection conexion, String nombre, String telefono) {
         try {
             String insertar = "INSERT INTO Clientes (Nombre, Telefono) VALUES (?, ?)";
             PreparedStatement ps = conexion.prepareStatement(insertar, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -34,9 +27,9 @@ public class Clientes {
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
-            if(rs.next()){
+            if (rs.next()) {
                 return rs.getInt(1);
-            }else{
+            } else {
                 throw new SQLException("Error al obtener el ID del cliente");
             }
         } catch (SQLException e) {
@@ -44,6 +37,25 @@ public class Clientes {
             e.printStackTrace();
             return -1;
         }
+    }
+
+    public static int obtenerClienteID(Connection conexion, String nombre) {
+        try {
+            String verificarCliente = "SELECT Cliente_id FROM Clientes WHERE Nombre = ?";
+            PreparedStatement ps = conexion.prepareStatement(verificarCliente);
+            ps.setString(1, nombre);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("Cliente_id");
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al conseguir el id del cliente");
+            e.printStackTrace();
+            return -1;
+        }
 
     }
+
 }
