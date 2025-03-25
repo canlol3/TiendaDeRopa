@@ -31,6 +31,9 @@ Menus cliente:
 <img width="853" alt="Diagrama" src="https://github.com/user-attachments/assets/177462d1-02ee-408b-bc4b-280c265a0adc">
 
 ----- BASE DE DATOS -------
+CREATE DATABASE Tienda;
+USE Tienda;
+
 CREATE TABLE Productos (
     Producto_id INT PRIMARY KEY AUTO_INCREMENT,
     Nombre VARCHAR(100) NOT NULL,
