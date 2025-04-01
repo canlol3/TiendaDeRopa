@@ -42,7 +42,7 @@ public class Inventario {
 
          System.out.print("Ingrese el nombre del producto: ");
          String nombre = System.console().readLine();
-         int productoID = Productos.verificarProducto(conexion, nombre);
+         int productoID = Productos.verificarProducto(conexion, nombre,true);
          if (productoID == -1) {
             System.out.println("Error en el nombre del producto");
             return;

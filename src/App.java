@@ -1,15 +1,16 @@
 import java.sql.Connection;
 
 public class App {
-    public static Connection asegurarBBDD(){
+    public static Connection asegurarBBDD() {
         Connection conexion = ConnectionBD.conectar();
-        if(conexion==null){
+        if (conexion == null) {
             System.out.println("No hay conexión con la base de datos (MAIN)");
             return conexion;
-        }else{
+        } else {
             return conexion;
         }
     }
+
     public static void main(String[] args) throws Exception {
         Connection conexion = asegurarBBDD();
         String usuario;
@@ -18,21 +19,23 @@ public class App {
         usuario = System.console().readLine();
         System.out.print("Introduzca la contraseña: ");
         contrasena = System.console().readLine();
-        boolean login = Usuarios.login(conexion,usuario,contrasena);
-        if(login){
-            System.out.println("Eres admin");
-            gestionEmpleado(conexion);
-        }else{
-            System.out.print("¿Como se llama? ");
-            String nombre = System.console().readLine();
-            gestionCliente(conexion,nombre);
+        Boolean login = Usuarios.login(conexion, usuario, contrasena);
+        if (login != null) {
+
+            if (login) {
+                System.out.println("Eres admin");
+                gestionEmpleado(conexion);
+            } else {
+                System.out.print("¿Como se llama? ");
+                String nombre = System.console().readLine();
+                gestionCliente(conexion, nombre);
+            }
         }
-        
         conexion.close();
 
     }
 
-    public static void gestionCliente(Connection conexion,String nombre_cliente) {
+    public static void gestionCliente(Connection conexion, String nombre_cliente) {
         int opcion = 0;
         while (opcion != 4) {
             menus(1);
@@ -45,14 +48,14 @@ public class App {
                     break;
                 case 2:
                     // Comprar
-                    System.out.print("Buenas "+nombre_cliente+" ¿Que quieres comprar? ");
+                    System.out.print("Buenas " + nombre_cliente + " ¿Que quieres comprar? ");
                     String nombre = System.console().readLine().toLowerCase();
                     System.out.print("¿Que talla desea? ");
                     String talla = System.console().readLine().toLowerCase();
                     System.out.print("¿Como quiere pagar? ");
                     String pago = System.console().readLine();
                     Inventario.eliminarInventario(conexion, nombre, talla, 1, false);
-                    System.out.print("Has comprado: "+nombre +" talla: "+talla);
+                    System.out.println("Has comprado: " + nombre + " talla: " + talla);
                     Ventas.registrarVenta(conexion, nombre, talla, 1, pago, nombre_cliente);
                     break;
                 case 3:
@@ -68,6 +71,7 @@ public class App {
             }
         }
     }
+
     public static void gestionEmpleado(Connection conexion) {
         int opcion = 0;
         while (opcion != 5) {
@@ -97,7 +101,7 @@ public class App {
                     String talla = System.console().readLine().toLowerCase();
                     System.out.print("Introduce la cantidad a retirar: ");
                     int cant = Integer.parseInt(System.console().readLine());
-                    Inventario.eliminarInventario(conexion, nombre, talla, cant,true);
+                    Inventario.eliminarInventario(conexion, nombre, talla, cant, true);
                     break;
                 case 5:
                     // Salir
@@ -106,6 +110,7 @@ public class App {
             }
         }
     }
+
     public static void menus(int num) {
         switch (num) {
             case 1:
@@ -130,9 +135,10 @@ public class App {
 
         }
 
-        
     }
-    public static void separador(){
-        System.out.println("-----------------------------------------------------------------------------------------------------------");
+
+    public static void separador() {
+        System.out.println(
+                "-----------------------------------------------------------------------------------------------------------");
     }
 }

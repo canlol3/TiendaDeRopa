@@ -1,7 +1,7 @@
 import java.sql.*;
 
 public class Productos {
-    public static int verificarProducto(Connection conexion, String nombre) {
+    public static int verificarProducto(Connection conexion, String nombre,boolean admin) {
         try {
             String verificarNombre = "SELECT Producto_id FROM Productos WHERE Nombre = ?";
             PreparedStatement st = conexion.prepareStatement(verificarNombre);
@@ -11,13 +11,13 @@ public class Productos {
                 return rsProducto.getInt("Producto_id");
             } else {
                 System.out.println("No se encontro un producto con ese nombre");
+                if(admin){
                 System.out.println("¿Quieres añadir un producto nuevo? (S/N)");
                 String opcion = System.console().readLine();
                 if (opcion.equals("S")) {
                     return insertarProducto(conexion, nombre);
 
-                } else {
-                    // return anadirStock(conexion);
+                }
                 }
                 return -1;
             }

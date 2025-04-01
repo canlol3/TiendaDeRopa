@@ -57,7 +57,7 @@ public class Ventas {
     public static void registrarVenta(Connection conexion,String nombre_producto, String talla,int cant,String pago,String nombre_cliente){
         int clienteID = Clientes.verificarOInsertarCliente(conexion, nombre_cliente);
 
-        int productoID = Productos.verificarProducto(conexion, nombre_producto);
+        int productoID = Productos.verificarProducto(conexion, nombre_producto,false);
         if(productoID==-1){
             System.out.println("El producto no existe");
             return;
